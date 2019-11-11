@@ -1,9 +1,14 @@
 package main
 
 import (
-	"github.com/MrDienns/BakfietsCalculator/cmd"
+	"fmt"
+	"github.com/MrDienns/BakfietsCalculator/calculator"
 )
 
 func main() {
-	cmd.Execute()
+	data, err := calculator.ReadData("data/storedata.json")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(data)
 }
