@@ -1,0 +1,39 @@
+{
+  "brands": {
+    "Bakkie": {
+      "name": "Bakkie",
+      "models": {
+        "Pleur": {
+          "dailyPrice": 20,
+          "options": {
+            "Melk": {
+              "name": "Melk",
+              "dailyPrice": 3
+            },
+            "Suiker": {
+              "name": "Suiker",
+              "dailyPrice": 7
+            },
+            "Cupholder": {
+              "name": "Cupholder",
+              "dailyPrice": 5
+            }
+          }
+        }
+      }
+    },
+    "Juliana": {
+      "name": "Juliana",
+      "models": {
+        "Gouden Koets": {
+          "options": {
+            "Entertainment": {
+              "name": "Entertainment",
+              "dailyPrice": 50
+            }
+          }
+        }
+      }
+    }
+  }
+}
