@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/MrDienns/BakfietsCalculator/calculator"
 )
 
@@ -10,5 +9,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(data)
+	view := calculator.NewView(data)
+	view.Open()
 }

@@ -1,22 +1,89 @@
 {
   "brands": {
-    "Bakkie": {
-      "name": "Bakkie",
+    "Nihola": {
+      "name": "Nihola",
       "models": {
-        "Pleur": {
+        "Family": {
+          "name": "Family",
           "dailyPrice": 20,
           "options": {
-            "Melk": {
-              "name": "Melk",
+            "Regenscherm": {
+              "name": "Regenscherm",
               "dailyPrice": 3
             },
-            "Suiker": {
-              "name": "Suiker",
+            "Telefoonhouder": {
+              "name": "Telefoonhouder",
               "dailyPrice": 7
+            }
+          }
+        },
+        "Basic": {
+          "name": "Basic",
+          "dailyPrice": 20,
+          "options": {
+            "Regenscherm": {
+              "name": "Regenscherm",
+              "dailyPrice": 3
             },
-            "Cupholder": {
-              "name": "Cupholder",
-              "dailyPrice": 5
+            "Telefoonhouder": {
+              "name": "Telefoonhouder",
+              "dailyPrice": 7
+            }
+          }
+        },
+        "Dog": {
+          "name": "Dog",
+          "dailyPrice": 20,
+          "options": {
+            "Regenscherm": {
+              "name": "Regenscherm",
+              "dailyPrice": 3
+            },
+            "Telefoonhouder": {
+              "name": "Telefoonhouder",
+              "dailyPrice": 7
+            }
+          }
+        },
+        "Posterbike": {
+          "name": "Posterbike",
+          "dailyPrice": 20,
+          "options": {
+            "Regenscherm": {
+              "name": "Regenscherm",
+              "dailyPrice": 3
+            },
+            "Telefoonhouder": {
+              "name": "Telefoonhouder",
+              "dailyPrice": 7
+            }
+          }
+        },
+        "Cigar": {
+          "name": "Cigar",
+          "dailyPrice": 20,
+          "options": {
+            "Regenscherm": {
+              "name": "Regenscherm",
+              "dailyPrice": 3
+            },
+            "Telefoonhouder": {
+              "name": "Telefoonhouder",
+              "dailyPrice": 7
+            }
+          }
+        },
+        "Specials": {
+          "name": "Specials",
+          "dailyPrice": 20,
+          "options": {
+            "Regenscherm": {
+              "name": "Regenscherm",
+              "dailyPrice": 3
+            },
+            "Telefoonhouder": {
+              "name": "Telefoonhouder",
+              "dailyPrice": 7
             }
           }
         }
@@ -26,6 +93,7 @@
       "name": "Juliana",
       "models": {
         "Gouden Koets": {
+          "name": "Gouden Koets",
           "options": {
             "Entertainment": {
               "name": "Entertainment",
