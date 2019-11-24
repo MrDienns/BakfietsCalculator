@@ -1,6 +1,7 @@
 package calculator
 
 import (
+	"fmt"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 	"sort"
@@ -15,14 +16,14 @@ type view struct {
 	models        []*Model
 	optionsView   *tview.List
 	options       []*Option
-	schedulerView *tview.InputField
+	schedulerView *tview.Form
 	priceView     *tview.Table
 }
 
 func NewView(data *Data) *view {
 
-	brands := tview.NewList()
-	brands.ShowSecondaryText(false).SetBorder(true)
+	brands := tview.NewList().ShowSecondaryText(false)
+	brands.SetTitle("Merken").SetBorder(true)
 
 	models := tview.NewList().ShowSecondaryText(false)
 	models.SetTitle("Modellen").SetBorder(true)
@@ -30,11 +31,23 @@ func NewView(data *Data) *view {
 	options := tview.NewList().ShowSecondaryText(false)
 	options.SetTitle("Opties").SetBorder(true)
 
-	scheduler := tview.NewInputField()
-	scheduler.SetFieldBackgroundColor(tcell.ColorBlack)
-	scheduler.SetTitle("Planning").SetBorder(true)
+	scheduler := tview.NewForm()
+	scheduler.AddInputField("Naam", "", 30, nil, nil)
+	scheduler.AddInputField("E-mail adres", "", 30, nil, nil)
+	scheduler.AddInputField("Start datum", "", 20, nil, nil)
+	scheduler.AddInputField("Eind datum", "", 20, nil, nil)
+	scheduler.AddButton("Verder", nil)
+	scheduler.AddButton("Terug", nil)
+	scheduler.SetFieldBackgroundColor(tcell.ColorBlue)
+	scheduler.SetTitle("Reservering informatie").SetBorder(true)
 
 	price := tview.NewTable()
+	price.SetBorders(true)
+	price.SetCellSimple(0, 0, "Omschrijving")
+	price.SetCellSimple(0, 1, "Prijs per dag")
+	price.SetCellSimple(0, 2, "Totaal")
+	price.SetCellSimple(0, 3, "Btw")
+	price.SetBorderPadding(2, 2, 5, 5)
 	price.SetTitle("Prijs").SetBorder(true)
 
 	return &view{data, tview.NewApplication(), brands, make([]*Brand, 0), models,
@@ -82,7 +95,7 @@ func (v *view) openModels(b *Brand) {
 	v.models = make([]*Model, len(b.Models))
 	for _, model := range b.Models {
 		v.models[i] = model
-		v.modelsView.AddItem(model.Name, "", rune(i+49), func() {
+		v.modelsView.AddItem(fmt.Sprintf("%v - %v euro per dag", model.Name, model.DailyPrice), "", rune(i+49), func() {
 			v.openOptions(b, v.models[v.modelsView.GetCurrentItem()], nil)
 		})
 		i++
@@ -142,14 +155,47 @@ func (v *view) openOptions(b *Brand, m *Model, options map[*Option]bool) {
 
 func optionText(o *Option, options map[*Option]bool) string {
 	if options == nil {
-		return o.Name
+		return fmt.Sprintf("%v - %v euro per dag", o.Name, o.DailyPrice)
 	}
 	if chosen, exists := options[o]; exists && chosen {
-		return o.Name + " (Geselecteerd)"
+		return fmt.Sprintf("%v - %v euro per dag (Geselecteerd)", o.Name, o.DailyPrice)
 	}
-	return o.Name
+	return fmt.Sprintf("%v - %v euro per dag", o.Name, o.DailyPrice)
 }
 
 func (v *view) openScheduler(b *Brand, m *Model, o []*Option) {
+
+	v.schedulerView.GetButton(0).SetSelectedFunc(func() {
+		v.openPrice(b, m, o, 4)
+	})
+	v.schedulerView.GetButton(1).SetSelectedFunc(func() {
+		v.openOptions(b, m, nil)
+
+	})
+
 	v.app.SetFocus(v.schedulerView)
+}
+
+func (v *view) openPrice(b *Brand, m *Model, o []*Option, days int) {
+	v.priceView.SetCellSimple(1, 0, fmt.Sprintf("%v - %v", b.Name, m.Name))
+	v.priceView.SetCellSimple(1, 1, fmt.Sprintf("%v", m.DailyPrice))
+	v.priceView.SetCellSimple(1, 2, fmt.Sprintf("%v", m.DailyPrice * days))
+	v.priceView.SetCellSimple(1, 3, "21%")
+
+	dailyPrice := m.DailyPrice
+
+	for i, option := range o {
+		v.priceView.SetCellSimple(2+i, 0, option.Name)
+		v.priceView.SetCellSimple(2+i, 1, fmt.Sprintf("%v", option.DailyPrice))
+		v.priceView.SetCellSimple(2+i, 2, fmt.Sprintf("%v", option.DailyPrice * days))
+		v.priceView.SetCellSimple(2+i, 3, "21%")
+		dailyPrice = dailyPrice + option.DailyPrice
+	}
+
+	v.priceView.SetCellSimple(len(o) + 3, 0, "Totaal")
+	v.priceView.SetCellSimple(len(o) + 3, 1, fmt.Sprintf("%v", dailyPrice))
+	v.priceView.SetCellSimple(len(o) + 3, 2, fmt.Sprintf("%v", dailyPrice * days))
+	v.priceView.SetCellSimple(len(o) + 3, 3, "21%")
+
+	v.app.SetFocus(v.priceView)
 }
