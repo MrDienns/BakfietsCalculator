@@ -5,7 +5,7 @@
       "models": {
         "Family": {
           "name": "Family",
-          "dailyPrice": 20,
+          "dailyPrice": 16,
           "options": {
             "Regenscherm": {
               "name": "Regenscherm",
@@ -19,7 +19,7 @@
         },
         "Basic": {
           "name": "Basic",
-          "dailyPrice": 20,
+          "dailyPrice": 15,
           "options": {
             "Regenscherm": {
               "name": "Regenscherm",
@@ -33,7 +33,7 @@
         },
         "Dog": {
           "name": "Dog",
-          "dailyPrice": 20,
+          "dailyPrice": 8,
           "options": {
             "Regenscherm": {
               "name": "Regenscherm",
@@ -47,7 +47,7 @@
         },
         "Posterbike": {
           "name": "Posterbike",
-          "dailyPrice": 20,
+          "dailyPrice": 12,
           "options": {
             "Regenscherm": {
               "name": "Regenscherm",
@@ -61,7 +61,7 @@
         },
         "Cigar": {
           "name": "Cigar",
-          "dailyPrice": 20,
+          "dailyPrice": 13,
           "options": {
             "Regenscherm": {
               "name": "Regenscherm",
@@ -75,7 +75,7 @@
         },
         "Specials": {
           "name": "Specials",
-          "dailyPrice": 20,
+          "dailyPrice": 16,
           "options": {
             "Regenscherm": {
               "name": "Regenscherm",
