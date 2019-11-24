@@ -5,6 +5,7 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 	"sort"
+	"time"
 )
 
 type view struct {
@@ -18,6 +19,8 @@ type view struct {
 	options       []*Option
 	schedulerView *tview.Form
 	priceView     *tview.Table
+
+	startdate, enddate string
 }
 
 func NewView(data *Data) *view {
@@ -32,13 +35,10 @@ func NewView(data *Data) *view {
 	options.SetTitle("Opties").SetBorder(true)
 
 	scheduler := tview.NewForm()
-	scheduler.AddInputField("Naam", "", 30, nil, nil)
-	scheduler.AddInputField("E-mail adres", "", 30, nil, nil)
-	scheduler.AddInputField("Start datum", "", 20, nil, nil)
-	scheduler.AddInputField("Eind datum", "", 20, nil, nil)
+	scheduler.AddInputField("Start datum (dd-mm-yyyy)", "", 20, nil, nil)
+	scheduler.AddInputField("Eind datum (dd-mm-yyyy)", "", 20, nil, nil)
 	scheduler.AddButton("Verder", nil)
 	scheduler.AddButton("Terug", nil)
-	scheduler.SetFieldBackgroundColor(tcell.ColorBlue)
 	scheduler.SetTitle("Reservering informatie").SetBorder(true)
 
 	price := tview.NewTable()
@@ -51,7 +51,7 @@ func NewView(data *Data) *view {
 	price.SetTitle("Prijs").SetBorder(true)
 
 	return &view{data, tview.NewApplication(), brands, make([]*Brand, 0), models,
-		make([]*Model, 0), options, make([]*Option, 0), scheduler, price}
+		make([]*Model, 0), options, make([]*Option, 0), scheduler, price, "", ""}
 }
 
 func (v *view) Open() {
@@ -164,13 +164,42 @@ func optionText(o *Option, options map[*Option]bool) string {
 }
 
 func (v *view) openScheduler(b *Brand, m *Model, o []*Option) {
-
+	v.schedulerView.GetFormItem(0).(*tview.InputField).SetChangedFunc(func(text string) {
+		v.startdate = text
+	})
+	v.schedulerView.GetFormItem(1).(*tview.InputField).SetChangedFunc(func(text string) {
+		v.enddate = text
+	})
 	v.schedulerView.GetButton(0).SetSelectedFunc(func() {
-		v.openPrice(b, m, o, 4)
+		valid := true
+		start, err := time.Parse("02-01-2006", v.startdate)
+		if err != nil {
+			v.schedulerView.GetFormItem(0).(*tview.InputField).SetFieldBackgroundColor(tcell.ColorRed)
+			valid = false
+		}
+		end, err := time.Parse("02-01-2006", v.enddate)
+		if err != nil {
+			v.schedulerView.GetFormItem(1).(*tview.InputField).SetFieldBackgroundColor(tcell.ColorRed)
+			valid = false
+		}
+		if start.After(end) {
+			v.schedulerView.GetFormItem(0).(*tview.InputField).SetFieldBackgroundColor(tcell.ColorRed)
+			v.schedulerView.GetFormItem(1).(*tview.InputField).SetFieldBackgroundColor(tcell.ColorRed)
+			valid = false
+		}
+		if !valid {
+			// Literally cannot set the color for individual fields, looks like a bug?
+			//v.schedulerView.GetFormItem(0).(*tview.InputField).SetFieldBackgroundColor(tcell.ColorRed)
+			//v.schedulerView.GetFormItem(1).(*tview.InputField).SetFieldBackgroundColor(tcell.ColorRed)
+			v.schedulerView.SetFieldBackgroundColor(tcell.ColorRed)
+			return
+		}
+		v.schedulerView.SetFieldBackgroundColor(tcell.ColorBlue)
+		days := end.Sub(start).Hours() / 24 + 1
+		v.openPrice(b, m, o, int(days))
 	})
 	v.schedulerView.GetButton(1).SetSelectedFunc(func() {
 		v.openOptions(b, m, nil)
-
 	})
 
 	v.app.SetFocus(v.schedulerView)

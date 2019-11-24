@@ -93,11 +93,16 @@
       "name": "Juliana",
       "models": {
         "Gouden Koets": {
+          "dailyPrice": 200,
           "name": "Gouden Koets",
           "options": {
             "Entertainment": {
               "name": "Entertainment",
               "dailyPrice": 50
+            },
+            "Chauffeur": {
+              "name": "Chauffeur",
+              "dailyPrice": 60
             }
           }
         }
