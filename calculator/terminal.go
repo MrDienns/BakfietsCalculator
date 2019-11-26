@@ -2,12 +2,15 @@ package calculator
 
 import (
 	"fmt"
-	"github.com/gdamore/tcell"
-	"github.com/rivo/tview"
 	"sort"
 	"time"
+
+	"github.com/gdamore/tcell"
+	"github.com/rivo/tview"
 )
 
+// view is a struct used to keep track of sub containers for the GUI and some of the data that needs to high level be
+// available. It also has a reference to the catalogue data so that all views can visualise this data.
 type view struct {
 	data          *Data
 	app           *tview.Application
@@ -23,6 +26,8 @@ type view struct {
 	startdate, enddate string
 }
 
+// NewView constructs a new *view and returns it. It initialises all GUI's and adds the provided *Data as reference on
+// the struct.
 func NewView(data *Data) *view {
 
 	brands := tview.NewList().ShowSecondaryText(false)
@@ -54,6 +59,7 @@ func NewView(data *Data) *view {
 		make([]*Model, 0), options, make([]*Option, 0), scheduler, price, "", ""}
 }
 
+// Open will start the terminal GUI and visualise it to the screen.
 func (v *view) Open() {
 	// Init brand view
 	v.openBrands()
@@ -78,6 +84,7 @@ func (v *view) Open() {
 	v.app.Run()
 }
 
+// openBrands opens the brand list panel. It takes all brands from the provided data and visualises it in the GUI.
 func (v *view) openBrands() {
 	i := 0
 	v.brands = make([]*Brand, len(v.data.Brands))
@@ -90,6 +97,8 @@ func (v *view) openBrands() {
 	}
 }
 
+// openModels opens the model list panel for the provided brand. It takes all models from the provided brand and
+// visualises it in the GUI.
 func (v *view) openModels(b *Brand) {
 	i := 0
 	v.models = make([]*Model, len(b.Models))
@@ -103,6 +112,9 @@ func (v *view) openModels(b *Brand) {
 	v.app.SetFocus(v.modelsView)
 }
 
+// openOptions opens the option list panel for the provided model. It takes all options from the provided model and
+// visualises it in the GUI. In order to allow for some better usability, the function makes sure to sort all option
+// names alphabetically.
 func (v *view) openOptions(b *Brand, m *Model, options map[*Option]bool) {
 
 	v.optionsView.Clear()
@@ -153,6 +165,10 @@ func (v *view) openOptions(b *Brand, m *Model, options map[*Option]bool) {
 	v.app.SetFocus(v.optionsView)
 }
 
+// optionText is used to pass an option as well as the selected option map. It will return a string depending on whether
+// or not the provided option is part of the provided selected option map. If it is, a string is returned which can be
+// visually represented to the user to indicate that the option was selected. If not, the base string is returned which
+// contains the option name and the daily price.
 func optionText(o *Option, options map[*Option]bool) string {
 	if options == nil {
 		return fmt.Sprintf("%v - %v euro per dag", o.Name, o.DailyPrice)
@@ -163,6 +179,9 @@ func optionText(o *Option, options map[*Option]bool) string {
 	return fmt.Sprintf("%v - %v euro per dag", o.Name, o.DailyPrice)
 }
 
+// openScheduler opens the scheduler GUI. This GUI asks for two dates; a start and end date. Input is validated by
+// trying to parse the input to a time struct. It then checks if the dates are logical. If either check fails, the input
+// fields are marked as red to indicate a validation issue.
 func (v *view) openScheduler(b *Brand, m *Model, o []*Option) {
 	v.schedulerView.GetFormItem(0).(*tview.InputField).SetChangedFunc(func(text string) {
 		v.startdate = text
@@ -195,7 +214,7 @@ func (v *view) openScheduler(b *Brand, m *Model, o []*Option) {
 			return
 		}
 		v.schedulerView.SetFieldBackgroundColor(tcell.ColorBlue)
-		days := end.Sub(start).Hours() / 24 + 1
+		days := end.Sub(start).Hours()/24 + 1
 		v.openPrice(b, m, o, int(days))
 	})
 	v.schedulerView.GetButton(1).SetSelectedFunc(func() {
@@ -205,10 +224,12 @@ func (v *view) openScheduler(b *Brand, m *Model, o []*Option) {
 	v.app.SetFocus(v.schedulerView)
 }
 
+// openPrice will open the GUI element that builds a table which represents the price for the full order. It lists the
+// brand, the model and the chosen options individually, per day and as a total.
 func (v *view) openPrice(b *Brand, m *Model, o []*Option, days int) {
 	v.priceView.SetCellSimple(1, 0, fmt.Sprintf("%v - %v", b.Name, m.Name))
 	v.priceView.SetCellSimple(1, 1, fmt.Sprintf("%v", m.DailyPrice))
-	v.priceView.SetCellSimple(1, 2, fmt.Sprintf("%v", m.DailyPrice * days))
+	v.priceView.SetCellSimple(1, 2, fmt.Sprintf("%v", m.DailyPrice*days))
 	v.priceView.SetCellSimple(1, 3, "21%")
 
 	dailyPrice := m.DailyPrice
@@ -216,15 +237,15 @@ func (v *view) openPrice(b *Brand, m *Model, o []*Option, days int) {
 	for i, option := range o {
 		v.priceView.SetCellSimple(2+i, 0, option.Name)
 		v.priceView.SetCellSimple(2+i, 1, fmt.Sprintf("%v", option.DailyPrice))
-		v.priceView.SetCellSimple(2+i, 2, fmt.Sprintf("%v", option.DailyPrice * days))
+		v.priceView.SetCellSimple(2+i, 2, fmt.Sprintf("%v", option.DailyPrice*days))
 		v.priceView.SetCellSimple(2+i, 3, "21%")
 		dailyPrice = dailyPrice + option.DailyPrice
 	}
 
-	v.priceView.SetCellSimple(len(o) + 3, 0, "Totaal")
-	v.priceView.SetCellSimple(len(o) + 3, 1, fmt.Sprintf("%v", dailyPrice))
-	v.priceView.SetCellSimple(len(o) + 3, 2, fmt.Sprintf("%v", dailyPrice * days))
-	v.priceView.SetCellSimple(len(o) + 3, 3, "21%")
+	v.priceView.SetCellSimple(len(o)+3, 0, "Totaal")
+	v.priceView.SetCellSimple(len(o)+3, 1, fmt.Sprintf("%v", dailyPrice))
+	v.priceView.SetCellSimple(len(o)+3, 2, fmt.Sprintf("%v", dailyPrice*days))
+	v.priceView.SetCellSimple(len(o)+3, 3, "21%")
 
 	v.app.SetFocus(v.priceView)
 }
